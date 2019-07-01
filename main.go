@@ -16,8 +16,8 @@ func main() {
 
 	pathToMC := pathToMCMap[runtime.GOOS]
 
-	if exists, err := minecraftExists(pathToMC); exists && err == nil {
-		println("gucci")
+	if exists, err := minecraftExists(pathToMC); !exists || err != nil {
+		return
 	}
 
 }
