@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"runtime"
@@ -28,24 +28,14 @@ func main() {
 	}
 	defer file.Close()
 
-	buf := make([]byte, 32*1024) // define your buffer size here.
-
-	for {
-		n, err := file.Read(buf)
-
-		if n > 0 {
-			fmt.Printl((buf[:n]) // your read buffer.
-		}
-
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Printf("read %d bytes: %v", n, err)
-			break
-		}
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
 	}
 
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func dirExists(path string) (bool, error) {
@@ -71,15 +61,9 @@ func minecraftExists(path string) (bool, error) {
 	}
 
 	if !exists {
-		println("Minecraft directory not found, quitting")
+		fmt.Println("Minecraft directory not found, quitting")
 		return false, err
 	}
 
 	return true, nil
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }
