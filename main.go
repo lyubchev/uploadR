@@ -1,17 +1,46 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 	"runtime"
 )
 
-var envPathMap = make(map[string]string)
+var pathToMCMap = make(map[string]string)
 
 func main() {
 
-	envPathMap["windows"] = "%APPDATA%\\.minecraft"
-	envPathMap["linux"] = "~/.minecraft"
-	envPathMap["macOS"] = "~/Library/Application Support/minecraft"
+	pathToMCMap["windows"] = os.Getenv("APPDATA") + "\\.minecraft"
+	pathToMCMap["linux"] = "~/.minecraft"
+	pathToMCMap["macOS"] = "~/Library/Application Support/minecraft"
 
-	fmt.Println(runtime.GOOS)
+	pathToMC := pathToMCMap[runtime.GOOS]
+
+	exists, err := dirExists(pathToMC)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	if !exists {
+		println("Minecraft directory not found, quitting")
+		return
+	} else {
+		println("Minecraft directory found, uploading your pack. Please wait...")
+	}
+}
+
+func dirExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+
+	if err == nil {
+		return true, nil
+	}
+
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	return true, err
 }
