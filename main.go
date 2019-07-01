@@ -16,19 +16,10 @@ func main() {
 
 	pathToMC := pathToMCMap[runtime.GOOS]
 
-	exists, err := dirExists(pathToMC)
-
-	if err != nil {
-		log.Fatal(err)
-		return
+	if exists, err := minecraftExists(pathToMC); exists && err == nil {
+		println("gucci")
 	}
 
-	if !exists {
-		println("Minecraft directory not found, quitting")
-		return
-	} else {
-		println("Minecraft directory found, uploading your pack. Please wait...")
-	}
 }
 
 func dirExists(path string) (bool, error) {
@@ -43,4 +34,20 @@ func dirExists(path string) (bool, error) {
 	}
 
 	return true, err
+}
+
+func minecraftExists(path string) (bool, error) {
+	exists, err := dirExists(path)
+
+	if err != nil {
+		log.Fatal(err)
+		return true, err
+	}
+
+	if !exists {
+		println("Minecraft directory not found, quitting")
+		return false, err
+	}
+
+	return true, nil
 }
