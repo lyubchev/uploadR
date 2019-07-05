@@ -57,7 +57,7 @@ func main() {
 					log.Fatal(err)
 				}
 
-				fmt.Printf("%v\n", url)
+				fmt.Printf("%v: %v\n", rp, url)
 			}
 
 			break
