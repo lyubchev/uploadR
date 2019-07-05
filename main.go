@@ -15,6 +15,8 @@ var pathToMCMap = map[string]string{}
 var resourcePack string
 
 func main() {
+	result := make(chan string, 2)
+	total := 0
 
 	pathToMCMap["windows"] = os.Getenv("APPDATA") + "/.minecraft"
 	pathToMCMap["linux"] = os.Getenv("HOME") + "/.minecraft"
@@ -41,23 +43,12 @@ func main() {
 		if strings.HasPrefix(currentLine, "resourcePacks:") {
 			rpNameToBeParsed := strings.Split(currentLine, ":")[1]
 			rpNames := strings.Split(rpNameToBeParsed[2:len(rpNameToBeParsed)-2], "\",\"")
+			total = len(rpNames)
 
 			for _, rp := range rpNames {
 				currentResourcePackPath := pathToMC + "/resourcepacks/" + rp
 
-				file, err := os.Open(currentResourcePackPath)
-
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				url, err := fileupload.UploadToHost("https://0x0.st", file)
-
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				fmt.Printf("%v: %v\n", rp, url)
+				go uploadRp(rp, currentResourcePackPath, result)
 			}
 
 			break
@@ -67,6 +58,12 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	for i := 0; i < total; i++ {
+		fmt.Println(<-result)
+	}
+
+	close(result)
 }
 
 func dirExists(path string) (bool, error) {
@@ -107,4 +104,20 @@ func minecraftExists(pathToMC string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func uploadRp(rpName, path string, result chan string) {
+	file, err := os.Open(path)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	url, err := fileupload.UploadToHost("https://0x0.st", file)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result <- rpName + ": " + url
 }
