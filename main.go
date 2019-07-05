@@ -17,8 +17,8 @@ var resourcePack string
 func main() {
 
 	pathToMCMap["windows"] = os.Getenv("APPDATA") + "/.minecraft"
-	pathToMCMap["linux"] = "~/.minecraft"
-	pathToMCMap["darwin"] = "~/Library/Application Support/minecraft"
+	pathToMCMap["linux"] = os.Getenv("HOME") + "/.minecraft"
+	pathToMCMap["darwin"] = os.Getenv("HOME") + "/Library/Application Support/minecraft"
 
 	pathToMC := pathToMCMap[runtime.GOOS]
 
