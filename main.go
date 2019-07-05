@@ -6,9 +6,13 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strings"
+
+	"github.com/SoMuchForSubtlety/fileupload"
 )
 
-var pathToMCMap = make(map[string]string)
+var pathToMCMap = map[string]string{}
+var resourcePack string
 
 func main() {
 
@@ -23,14 +27,41 @@ func main() {
 	}
 
 	file, err := os.Open(pathToMC + "\\options.txt")
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		currentLine := scanner.Text()
+
+		if strings.HasPrefix(currentLine, "resourcePacks:") {
+			rpNameToBeParsed := strings.Split(currentLine, ":")[1]
+			rpNames := strings.Split(rpNameToBeParsed[2:len(rpNameToBeParsed)-2], "\",\"")
+
+			for _, rp := range rpNames {
+				currentResourcePackPath := pathToMC + "\\resourcepacks\\" + rp
+
+				file, err := os.Open(currentResourcePackPath)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				url, err := fileupload.UploadToHost("https://0x0.st", file)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Printf("%v\n", url)
+			}
+
+			break
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -52,8 +83,18 @@ func dirExists(path string) (bool, error) {
 	return true, err
 }
 
-func minecraftExists(path string) (bool, error) {
-	exists, err := dirExists(path)
+func isDir(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
+
+	if err != nil {
+		return false, err
+	}
+
+	return fileInfo.IsDir(), err
+}
+
+func minecraftExists(pathToMC string) (bool, error) {
+	exists, err := dirExists(pathToMC)
 
 	if err != nil {
 		log.Fatal(err)
