@@ -16,7 +16,7 @@ var resourcePack string
 
 func main() {
 
-	pathToMCMap["windows"] = os.Getenv("APPDATA") + "\\.minecraft"
+	pathToMCMap["windows"] = os.Getenv("APPDATA") + "/.minecraft"
 	pathToMCMap["linux"] = "~/.minecraft"
 	pathToMCMap["darwin"] = "~/Library/Application Support/minecraft"
 
@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	file, err := os.Open(pathToMC + "\\options.txt")
+	file, err := os.Open(pathToMC + "/options.txt")
 
 	if err != nil {
 		log.Fatal(err)
@@ -43,7 +43,7 @@ func main() {
 			rpNames := strings.Split(rpNameToBeParsed[2:len(rpNameToBeParsed)-2], "\",\"")
 
 			for _, rp := range rpNames {
-				currentResourcePackPath := pathToMC + "\\resourcepacks\\" + rp
+				currentResourcePackPath := pathToMC + "/resourcepacks/" + rp
 
 				file, err := os.Open(currentResourcePackPath)
 
